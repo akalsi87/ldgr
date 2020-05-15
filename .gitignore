@@ -1,0 +1,12 @@
+# gitignore file
+
+# default build and install directories
+/build*
+/install*
+
+# Editors, IDEs
+/.idea/
+/cmake-build-*
+/.vscode
+**/*~
+**/\#*

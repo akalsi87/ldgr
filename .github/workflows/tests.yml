@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-linux-64:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: B&T (Debug,static)
+      run: |
+        cd $GITHUB_WORKSPACE
+        ./make.sh check --type=Debug
+    - name: B&T (Debug,shared)
+      run: |
+        cd $GITHUB_WORKSPACE
+        ./make.sh check --type=Debug --shared
+    - name: B&T (RelWithDebInfo,static)
+      run: |
+        cd $GITHUB_WORKSPACE
+        ./make.sh check --type=RelWithDebInfo
+    - name: B&T (RelWithDebInfo,shared)
+      run: |
+        cd $GITHUB_WORKSPACE
+        ./make.sh check --type=RelWithDebInfo --shared
+  build-mac-64:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: B&T (Debug,static)
+      run: |
+        cd $GITHUB_WORKSPACE
+        ./make.sh check --type=Debug
+    - name: B&T (Debug,shared)
+      run: |
+        cd $GITHUB_WORKSPACE
+        ./make.sh check --type=Debug --shared
+    - name: B&T (RelWithDebInfo,static)
+      run: |
+        cd $GITHUB_WORKSPACE
+        ./make.sh check --type=RelWithDebInfo
+    - name: B&T (RelWithDebInfo,shared)
+      run: |
+        cd $GITHUB_WORKSPACE
+        ./make.sh check --type=RelWithDebInfo --shared
+  build-win-32:
+    runs-on: windows-2016
+    steps:
+    - uses: actions/checkout@v2
+    - name: B&T (Debug,static)
+      shell: bash
+      run: |
+        cd $GITHUB_WORKSPACE
+        ./make.sh check --type=Debug --generator='Visual Studio 15'
+    - name: B&T (Debug,shared)
+      shell: bash
+      run: |
+        cd $GITHUB_WORKSPACE
+        ./make.sh check --type=Debug --shared --generator='Visual Studio 15'
+    - name: B&T (RelWithDebInfo,static)
+      shell: bash
+      run: |
+        cd $GITHUB_WORKSPACE
+        ./make.sh check --type=RelWithDebInfo --generator='Visual Studio 15'
+    - name: B&T (RelWithDebInfo,shared)
+      shell: bash
+      run: |
+        cd $GITHUB_WORKSPACE
+        ./make.sh check --type=RelWithDebInfo --shared --generator='Visual Studio 15'
+  build-win-64:
+    runs-on: windows-2016
+    steps:
+    - uses: actions/checkout@v2
+    - name: B&T (Debug,static)
+      shell: bash
+      run: |
+        cd $GITHUB_WORKSPACE
+        ./make.sh check --type=Debug --generator='Visual Studio 15 Win64'
+    - name: B&T (Debug,shared)
+      shell: bash
+      run: |
+        cd $GITHUB_WORKSPACE
+        ./make.sh check --type=Debug --shared --generator='Visual Studio 15 Win64'
+    - name: B&T (RelWithDebInfo,static)
+      shell: bash
+      run: |
+        cd $GITHUB_WORKSPACE
+        ./make.sh check --type=RelWithDebInfo --generator='Visual Studio 15 Win64'
+    - name: B&T (RelWithDebInfo,shared)
+      shell: bash
+      run: |
+        cd $GITHUB_WORKSPACE
+        ./make.sh check --type=RelWithDebInfo --shared --generator='Visual Studio 15 Win64'

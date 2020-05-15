@@ -1,0 +1,28 @@
+# Doxyfile for target '@_NAME@'
+
+PROJECT_NAME           = "@_NAME@"
+PROJECT_NUMBER         = @ver_maj@.@ver_min@.@ver_patch@
+STRIP_FROM_PATH        = @CSKEL_PROJ_ROOT@/include \
+                         @CSKEL_PROJ_ROOT@/src \
+                         @PROJECT_BINARY_DIR@ \
+                         @3p_inst@/include
+INPUT                  = @CSKEL_PROJ_ROOT@/src/@_NAME@@_cskel_sep@README.md \
+                         @CSKEL_PROJ_ROOT@/include/@_NAME@ \
+                         @CSKEL_PROJ_ROOT@/src/@_NAME@ \
+                         @CSKEL_PROJ_ROOT@/include \
+                         @CSKEL_PROJ_ROOT@/src \
+                         @PROJECT_BINARY_DIR@/@_NAME@ \
+                         @PROJECT_BINARY_DIR@
+FILE_PATTERNS          = *.hxx \
+                         *.cxx \
+                         *.hpp \
+                         *.cpp \
+                         *.h \
+                         *.c
+RECURSIVE              = YES
+SHOW_FILES             = YES
+GENERATE_LATEX         = NO
+EXTRACT_ALL            = NO
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+USE_MDFILE_AS_MAINPAGE = @CSKEL_PROJ_ROOT@/src/@_NAME@@_cskel_sep@README.md

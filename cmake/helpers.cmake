@@ -85,6 +85,30 @@ macro(add_tgt_dir_dep_exe NAME)
   endif()
 endmacro(add_tgt_dir_dep_exe)
 
+#[[ Find Python3 ]]
+set(Python_ADDITIONAL_VERSIONS 3.6 3.7 3.8 3.9)
+find_package(PythonInterp)
+
+#[[ msggen ]]
+
+function(msggen file ns outdir)
+  if (NOT Python_FOUND)
+    message(FATAL_ERROR "${CSKEL_PROJ_NAME} Python interpreter not found")
+  endif()
+  set(
+    args
+    ${Python_EXECUTABLE}
+    ${CSKEL_PROJ_ROOT}/py/msggen.py
+    gencpp
+    --file ${file}
+    --namespace ${ns}
+    --out-dir ${outdir}
+  )
+  string(REPLACE ";" " " cpargs "${args}")
+  cskel_info("Running: ${cpargs}")
+  execute_process(COMMAND ${args})
+endfunction(msggen)
+
 #[[ On Windows, don't rely on SDKs being available ]]
 
 if (WIN32)
@@ -174,7 +198,7 @@ endif()
 
 #[[ section ends ]]
 
-#[[ On Windows, don't rely on SDKs being available ]]
+#[[ Add doxygen support if available ]]
 
 if (DOXYGEN_FOUND)
   cskel_info("Doxygen.........: ON")
@@ -564,11 +588,15 @@ function(cskel_add_tests)
     endif()
   endif()
 
+  target_include_directories(
+    ${_NAME}-lib-tests
+    PRIVATE
+    ${CSKEL_PROJ_ROOT}/3p)
+
   target_link_libraries(
     ${_NAME}-lib-tests
     PRIVATE
-    ${_NAME}
-    GTest::gtest GTest::gmock)
+    ${_NAME})
 
   if (WIN32)
     add_custom_target(
@@ -671,5 +699,3 @@ endfunction(cskel_config_install_exports)
 macro(cskel_install_3p NAME)
   include(${CSKEL_PROJ_ROOT}/3p/${NAME}/targets.cmake)
 endmacro(cskel_install_3p)
-
-cskel_install_3p(gtest)

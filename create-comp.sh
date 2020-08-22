@@ -143,11 +143,13 @@ mkdir -p "${where}${comp_dir}"
 if test "$lang" = C; then
 
 cat <<EOF > "${where}${comp_path}${hdr_ext}"
-/// @file ${comp_name}${hdr_ext}
-/// @brief description
-/*
-$(print_starred_license)
- */
+//! @file ${comp_name}${hdr_ext}
+//! @brief description
+
+//          Copyright $(git config --global user.name) $(date +%Y).
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.md or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef $guard
 #define $guard
@@ -160,11 +162,13 @@ EOF
 else
 
 cat <<EOF > "${where}${comp_path}${hdr_ext}"
-/// @file ${comp_name}${hdr_ext}
-/// @brief description
-/*
-$(print_starred_license)
- */
+//! @file ${comp_name}${hdr_ext}
+//! @brief description
+
+//          Copyright $(git config --global user.name) $(date +%Y).
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.md or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef $guard
 #define $guard
@@ -192,10 +196,12 @@ fi
 if test "$lang" = C; then
 
 cat <<EOF > "src/${comp_path}${src_ext}"
-/// @file ${comp_name}${src_ext}
-/*
-$(print_starred_license)
- */
+//! @file ${comp_name}${src_ext}
+
+//          Copyright $(git config --global user.name) $(date +%Y).
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.md or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
 
 #include ${incl_beg}${comp_path}${hdr_ext}${incl_end}
 
@@ -206,12 +212,14 @@ EOF
 else
 
 cat <<EOF > "src/${comp_path}${src_ext}"
-/// @file ${comp_name}${src_ext}
-/*
-$(print_starred_license)
- */
+//! @file ${comp_name}${src_ext}
 
 #include ${incl_beg}${comp_path}${hdr_ext}${incl_end}
+
+//          Copyright $(git config --global user.name) $(date +%Y).
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.md or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
 
 $(print_namespace_begin)
 
@@ -228,33 +236,18 @@ fi
 
 mkdir -p "tests/${comp_dir}"
 cat <<EOF > "tests/${comp_path}${cpp_src_ext}"
-/// @file ${comp_name}${cpp_src_ext}
+//! @file ${comp_name}${cpp_src_ext}
 
 #include <${comp_path}${hdr_ext}>
 
-#include <gtest/gtest.h>
+#include <catch2/catch.hpp>
 
-class t${comp_name} : public ::testing::Test
+TEST_CASE("${comp_name}: basic")
 {
-  public:
-    ~t${comp_name}() noexcept override = default;
-
-    /// Suite level set up.
-    using Test::SetUpTestSuite;
-
-    /// Suite level tear down.
-    using Test::TearDownTestSuite;
-
-  protected:
-    /// Test case set up.
-    using Test::SetUp;
-
-    /// Test case tear down.
-    using Test::TearDown;
-};
-
-TEST_F(t${comp_name}, basic)
-{
-    EXPECT_EQ(0, 0);
+    // Common code
+    SECTION("section 1")
+    {
+        // Section specific code
+    }
 }
 EOF

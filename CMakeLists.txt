@@ -4,20 +4,23 @@ cmake_minimum_required(VERSION 3.0)
 
 include(cmake/utils.cmake)
 
-set(CSKEL_FLAT_LAYOUT ON CACHE BOOL "Flat layout vs directory per target")
+set(CSKEL_FLAT_LAYOUT OFF CACHE BOOL "Flat layout vs directory per target")
 
-cskel_project(
+project(
+  ${CSKEL_PROJ_NAME}
   VERSION 0.1.0
   LANGUAGES C CXX)
+
+include(cmake/helpers.cmake)
 
 #[[ Set the compiler standards ]]
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 99)
 
-#[[ 3rd part dependencies ]]
+#[[ 3rd party dependencies ]]
 
-#==-- Boost dependency
+#[[ Boost dependency ]]
 # cskel_install_3p(boost)
 # set(Boost_DEBUG 1)
 # set(Boost_VERBOSE 1)
@@ -42,11 +45,20 @@ cskel_add_library(
  VERSION
   0.1.1
   )
-
 target_link_libraries(
   pkg
  PUBLIC
   )
+
+if (WIN32)
+  target_compile_definitions(
+    pkg
+   PRIVATE
+    _CRT_SECURE_NO_WARNINGS
+    _SCL_SECURE_NO_WARNINGS
+    _WINSOCK_DEPRECATED_NO_WARNINGS
+    )
+endif()
 
 cskel_add_tests(NAME pkg)
 
@@ -55,6 +67,6 @@ cskel_add_tests(NAME pkg)
 cskel_config_install_exports()
 
 install(
-  FILES ${PROJECT_SOURCE_DIR}/LICENSE
+  FILES ${PROJECT_SOURCE_DIR}/LICENSE.md
   DESTINATION share/${CSKEL_PROJ_NAME}
   RENAME LICENSE.${CSKEL_PROJ_NAME})

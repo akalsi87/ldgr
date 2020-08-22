@@ -30,14 +30,6 @@ set(CSKEL_PROJ_ROOT ${_git_proj_name})
 # CSKEL_PROJ_NAME: Base name of the root path, i.e. name of the project
 get_filename_component(CSKEL_PROJ_NAME "${CSKEL_PROJ_ROOT}" NAME)
 
-# cskel_project(...)
-#
-# Pass all 'project' arguments except project name
-macro(cskel_project)
-  project(${CSKEL_PROJ_NAME} ${ARGN})
-  include(cmake/helpers.cmake)
-endmacro(cskel_project)
-
 # cskel_info(...)
 #
 # Log information at INFO level.

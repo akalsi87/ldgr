@@ -5,7 +5,7 @@ root=$(cd $(dirname $0) && pwd)
 build_type="Debug"
 prefix="$root/install"
 gen_arg=""
-shared=0
+shared=OFF
 target=check
 
 mkdir -p "$prefix"
@@ -63,7 +63,7 @@ while [ "$1" != "" ]; do
             gen_arg="-G'$VALUE'"
             ;;
         --shared)
-            shared=1
+            shared=ON
             ;;
         *)
             echo "ERROR: unknown parameter \"$PARAM\""

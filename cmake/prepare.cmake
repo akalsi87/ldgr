@@ -17,10 +17,13 @@ cskel_try_compile_run(
       printf(\"%d\", b[1])\;
       return 0\;
   }"
-  c)
+  c
+  )
 if (NOT ${_endian_test_rc} STREQUAL 0)
-  cskel_error("Failed to run endianness test program: rc=${_endian_test_rc}")
-endif()
+  cskel_error(
+    "Failed to run endianness test program: rc=${_endian_test_rc}"
+    )
+endif ()
 
 # set WORD_SIZE to the size of a pointer (e.g. 32/64).
 cskel_try_compile_run(
@@ -33,34 +36,37 @@ cskel_try_compile_run(
       printf(\"%d\", sizeof(void*) * 8)\;
       return 0\;
   }"
-  c)
+  c
+  )
 
 if (NOT ${_word_size_rc} STREQUAL 0)
-  cskel_error("Failed to run word-size test program: rc=${_word_size_rc}")
-endif()
+  cskel_error(
+    "Failed to run word-size test program: rc=${_word_size_rc}"
+    )
+endif ()
 
 if (NOT DEFINED BUILD_SHARED_LIBS)
   set(BUILD_SHARED_LIBS OFF)
-endif()
+endif ()
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "")
   set(CMAKE_BUILD_TYPE Debug)
-endif()
+endif ()
 
 if (NOT DEFINED BUILD_TESTING)
   set(BUILD_TESTING ON)
-endif()
+endif ()
 
 if (WIN32)
   set(homedir $ENV{USERPROFILE})
   get_filename_component(homedir "${homedir}" ABSOLUTE)
-else()
+else ()
   set(homedir $ENV{HOME})
-endif()
+endif ()
 
 if (NOT 3P_ROOT)
   set(3P_ROOT ${homedir}/.cskel)
-endif()
+endif ()
 
 set(3p_src ${3P_ROOT}/src)
 set(3p_bin ${3P_ROOT}/build)
@@ -68,13 +74,15 @@ set(3p_inst ${3P_ROOT}/root)
 
 if (BUILD_SHARED_LIBS)
   set(CSKEL_LIB_TYPE shared)
-else()
+else ()
   set(CSKEL_LIB_TYPE static)
-endif()
+endif ()
 
 find_package(Doxygen)
 
-set(_build_quad "${CMAKE_SYSTEM_NAME}_${CMAKE_BUILD_TYPE}_${CSKEL_LIB_TYPE}_${WORD_SIZE}")
+set(_build_quad
+    "${CMAKE_SYSTEM_NAME}_${CMAKE_BUILD_TYPE}_${CSKEL_LIB_TYPE}_${WORD_SIZE}"
+  )
 string(TOLOWER "${_build_quad}" CSKEL_BUILD_QUAD)
 
 cskel_info("")

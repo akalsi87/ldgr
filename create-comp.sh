@@ -146,10 +146,9 @@ cat <<EOF > "${where}${comp_path}${hdr_ext}"
 //! @file ${comp_name}${hdr_ext}
 //! @brief description
 
-//          Copyright $(git config --global user.name) $(date +%Y).
-// Distributed under the Boost Software License, Version 1.0.
-//    (See accompanying file LICENSE.md or copy at
-//          https://www.boost.org/LICENSE_1_0.txt)
+/*
+$(print_starred_license)
+ */
 
 #ifndef $guard
 #define $guard
@@ -165,10 +164,9 @@ cat <<EOF > "${where}${comp_path}${hdr_ext}"
 //! @file ${comp_name}${hdr_ext}
 //! @brief description
 
-//          Copyright $(git config --global user.name) $(date +%Y).
-// Distributed under the Boost Software License, Version 1.0.
-//    (See accompanying file LICENSE.md or copy at
-//          https://www.boost.org/LICENSE_1_0.txt)
+/*
+$(print_starred_license)
+ */
 
 #ifndef $guard
 #define $guard
@@ -198,11 +196,6 @@ if test "$lang" = C; then
 cat <<EOF > "src/${comp_path}${src_ext}"
 //! @file ${comp_name}${src_ext}
 
-//          Copyright $(git config --global user.name) $(date +%Y).
-// Distributed under the Boost Software License, Version 1.0.
-//    (See accompanying file LICENSE.md or copy at
-//          https://www.boost.org/LICENSE_1_0.txt)
-
 #include ${incl_beg}${comp_path}${hdr_ext}${incl_end}
 
 
@@ -215,11 +208,6 @@ cat <<EOF > "src/${comp_path}${src_ext}"
 //! @file ${comp_name}${src_ext}
 
 #include ${incl_beg}${comp_path}${hdr_ext}${incl_end}
-
-//          Copyright $(git config --global user.name) $(date +%Y).
-// Distributed under the Boost Software License, Version 1.0.
-//    (See accompanying file LICENSE.md or copy at
-//          https://www.boost.org/LICENSE_1_0.txt)
 
 $(print_namespace_begin)
 

@@ -129,7 +129,7 @@ class Error(Exception):
 
 
 def _parse_ast(src: str, filename: str = '<unknown>') -> ast.AST:
-    return ast.parse(src, feature_version=(3, 6))
+    return ast.parse(src)
 
 
 def _node_to_enumerator(node: ast.AST) -> Enumerator:
@@ -1046,7 +1046,7 @@ def _gen_sequence_method_def(nsq, bs, nl, stream, t):
 
     def _gen_json_print(x: Field) -> str:
         return f'''\
-os << " {x.name} = ";
+os << " {x.name}=";
     msggen::P<{_cpp_type(nsq, x)}>().print(os, obj.{x.name});'''
 
     def _gen_json_write(m: Field) -> str:

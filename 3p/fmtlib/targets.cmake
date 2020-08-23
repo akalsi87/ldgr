@@ -14,6 +14,7 @@ if (NOT EXISTS ${fmtlib_down})
     COMMAND
     ${GIT_EXECUTABLE} clone
     https://github.com/fmtlib/fmt
+	--branch 7.0.3
     ${fmtlib_down}
   )
 endif()

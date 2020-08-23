@@ -24,45 +24,25 @@ set(CMAKE_C_STANDARD 99)
 
 #[[ 3rd party dependencies ]]
 
-#[[ Boost dependency ]]
-# cskel_install_3p(boost)
-# set(Boost_DEBUG 1)
-# set(Boost_VERBOSE 1)
-# if (NOT BUILD_SHARED_LIBS)
-#   set(Boost_USE_STATIC_LIBS 1)
-# endif ()
-# if (POLICY CMP0074)
-#   cmake_policy(SET CMP0074 NEW)
-# endif ()
-# set(ENV{Boost_DIR} ${CMAKE_INSTALL_PREFIX})
-# set(ENV{BOOSTROOT} ${CMAKE_INSTALL_PREFIX})
-# set(ENV{BOOST_ROOT} ${CMAKE_INSTALL_PREFIX})
-# cskel_find_pkg(
-#   Boost
-#   1.72
-#   CONFIG
-#   REQUIRED
-#   COMPONENTS
-#   chrono
-#   thread
-#   filesystem
-#   iostreams
-#   system
-#   )
+#[[ fmt dependency ]]
+cskel_install_3p(fmtlib)
+cskel_find_pkg(fmt)
 
-#[[ Add library: pkg ]]
 
-cskel_add_library(NAME pkg VERSION 0.1.1)
-target_link_libraries(pkg PUBLIC)
+#[[ Add library: ldgr ]]
+
+cskel_add_library(NAME ldgr VERSION 0.1.1)
+target_link_libraries(ldgr PUBLIC fmt::fmt)
+add_library(ldgr::ldgr ALIAS ldgr)
 
 if (WIN32)
   target_compile_definitions(
-    pkg PRIVATE _CRT_SECURE_NO_WARNINGS _SCL_SECURE_NO_WARNINGS
+    ldgr PRIVATE _CRT_SECURE_NO_WARNINGS _SCL_SECURE_NO_WARNINGS
                 _WINSOCK_DEPRECATED_NO_WARNINGS
     )
 endif ()
 
-cskel_add_tests(NAME pkg)
+cskel_add_tests(NAME ldgr)
 
 #[[ Setup install and license ]]
 

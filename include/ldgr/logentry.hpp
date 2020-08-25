@@ -56,6 +56,7 @@ struct log_entry_fmt {
     fmt::string_view name;
     fmt::string_view file;
     fmt::string_view line;
+    std::time_t time;
     std::tm time_struct;
     long microseconds;
     bool is_local;
@@ -227,6 +228,7 @@ struct log_entry_util {
                           entry.name,
                           entry.file,
                           entry.line,
+                          time,
                           {},
                           micros,
                           local_time,

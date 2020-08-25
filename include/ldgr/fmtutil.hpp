@@ -35,31 +35,74 @@
 #include <cstddef>
 #include <ctime>
 #include <memory>
+#include <string>
 
 namespace ldgr {
 
 template <std::size_t SIZE>
 using buffer_t = fmt::basic_memory_buffer<char, SIZE>;
 
+template <class INT, int POW>
+constexpr INT pow10()
+{
+    if constexpr (POW == 0) {
+        return INT{1};
+    }
+    else if constexpr (POW == 1) {
+        return INT{10};
+    }
+    else {
+        return INT{10} * pow10<INT, POW - 1>();
+    }
+}
+
 struct fmtutil {
+    template <std::size_t PREC, class INT, std::size_t SIZE>
+    static constexpr buffer_t<SIZE>&
+    append_pad_int_(buffer_t<SIZE>& dest, INT n, char* p)
+    {
+        if constexpr (PREC == 0) {
+            static_cast<void>(dest);
+        }
+        else if constexpr (PREC == 1) {
+            *p = ('0' + n);
+        }
+        else if constexpr (PREC == 2) {
+            *(p++) = '0' + (n / 10);
+            *p = '0' + (n % 10);
+        }
+        else {
+            constexpr auto div = pow10<INT, PREC / 2>();
+            append_pad_int_<PREC - (PREC / 2), INT, SIZE>(dest, n / div, p);
+            p += (PREC - (PREC / 2));
+            append_pad_int_<PREC / 2, INT, SIZE>(dest, n % div, p);
+        }
+        return dest;
+    }
+
     template <std::size_t PREC, class INT, std::size_t SIZE>
     static constexpr buffer_t<SIZE>& append_pad_int(buffer_t<SIZE>& dest,
                                                     INT n)
     {
-        static_assert(PREC >= 1 && PREC <= 6, "Unaccounted for.");
-        constexpr INT s_table[] = {1000000, 100000, 10000, 1000, 100, 10, 1};
-
-        if constexpr (PREC == 1) {
-            dest.push_back('0' + n);
+        auto sz = dest.size();
+        if constexpr (PREC == 0) {
+            static_cast<void>(dest);
+        }
+        else if constexpr (PREC == 1) {
+            dest.resize(dest.size() + 1);
+            append_pad_int_<1, INT, SIZE>(dest, n, &dest[sz]);
         }
         else if constexpr (PREC == 2) {
-            dest.push_back('0' + (n / 10));
-            dest.push_back('0' + (n % 10));
+            dest.resize(dest.size() + 2);
+            append_pad_int_<2, INT, SIZE>(dest, n, &dest[sz]);
         }
         else {
-            constexpr auto div = *(std::end(s_table) - PREC);
-            dest.push_back('0' + (n / div));
-            append_pad_int<PREC - 1, INT, SIZE>(dest, n % div);
+            constexpr auto div = pow10<INT, PREC / 2>();
+            dest.resize(dest.size() + PREC);
+            append_pad_int_<PREC - (PREC / 2), INT, SIZE>(
+                dest, n / div, &dest[sz]);
+            sz += (PREC - (PREC / 2));
+            append_pad_int_<PREC / 2, INT, SIZE>(dest, n % div, &dest[sz]);
         }
         return dest;
     }
@@ -128,7 +171,7 @@ struct fmtutil {
     static constexpr buffer_t<SIZE>& append(buffer_t<SIZE>& dest,
                                             const char (&str)[STR_SIZE])
     {
-        dest.append(std::begin(str), std::end(str));
+        dest.append(std::begin(str), std::end(str) - 1);
         return dest;
     }
 
@@ -182,55 +225,70 @@ struct fmtutil {
                                             log_severity sev)
     {
         switch (sev) {
-            case log_severity::off:
-                fmt::format_to(
-                    std::back_inserter(dest), FMT_COMPILE("{:>5}"), "OFF");
-                break;
-            case log_severity::trace:
-                fmt::format_to(
-                    std::back_inserter(dest), FMT_COMPILE("{:>5}"), "TRACE");
-                break;
-            case log_severity::debug:
-                fmt::format_to(
-                    std::back_inserter(dest), FMT_COMPILE("{:>5}"), "DEBUG");
-                break;
-            case log_severity::info:
-                fmt::format_to(
-                    std::back_inserter(dest), FMT_COMPILE("{:>5}"), "INFO");
-                break;
-            case log_severity::warn:
-                fmt::format_to(
-                    std::back_inserter(dest), FMT_COMPILE("{:>5}"), "WARN");
-                break;
-            case log_severity::error:
-                fmt::format_to(
-                    std::back_inserter(dest), FMT_COMPILE("{:>5}"), "ERROR");
-                break;
-            case log_severity::fatal:
-                fmt::format_to(
-                    std::back_inserter(dest), FMT_COMPILE("{:>5}"), "FATAL");
-                break;
+            case log_severity::off: fmtutil::append(dest, "  OFF"); break;
+            case log_severity::trace: fmtutil::append(dest, "TRACE"); break;
+            case log_severity::debug: fmtutil::append(dest, "DEBUG"); break;
+            case log_severity::info: fmtutil::append(dest, " INFO"); break;
+            case log_severity::warn: fmtutil::append(dest, " WARN"); break;
+            case log_severity::error: fmtutil::append(dest, "ERROR"); break;
+            case log_severity::fatal: fmtutil::append(dest, "FATAL"); break;
         }
         return dest;
+    }
+
+    template <std::size_t SIZE>
+    static constexpr buffer_t<SIZE>& append(buffer_t<SIZE>& buff,
+                                            const std::string& str)
+    {
+        buff.append(str.data(), str.data() + str.size());
+        return buff;
+    }
+
+    template <std::size_t SIZE>
+    static constexpr buffer_t<SIZE>& append_eol(buffer_t<SIZE>& buff)
+    {
+#ifdef _WIN32
+        constexpr char EOL[] = "\r\n";
+#else
+        constexpr char EOL[] = "\n";
+#endif
+        return fmtutil::append(buff, EOL);
     }
 
     static constexpr fmt::string_view trunc_file(const fmt::string_view& v)
     {
         fmt::string_view x{v};
         int count = 0;
-        for (std::size_t i = 0; i < x.size(); ++i) {
-            if (x[x.size() - i - 1] == '/'
+        auto sz = x.size();
+        auto beg = x.data();
+        auto ridx = sz - 1;
+        for (std::size_t i = 0; i < sz; ++i, --ridx) {
+            if (beg[ridx] == '/'
 #ifdef _WIN32
-                || x[x.size() - i - 1] == '\\'
+                || beg[ridx] == '\\'
 #endif
             ) {
                 if (++count == 2) {
-                    fmt::string_view ret{x.data() + x.size() - i, i};
+                    fmt::string_view ret{beg + sz - i, i};
                     return ret;
                 }
             }
         }
         return x;
+    }
+
+    static constexpr fmt::string_view to_view(log_severity sev)
+    {
+        switch (sev) {
+            case log_severity::off: return fmtutil::to_view("OFF");
+            case log_severity::trace: return fmtutil::to_view("TRACE");
+            case log_severity::debug: return fmtutil::to_view("DEBUG");
+            case log_severity::info: return fmtutil::to_view("INFO");
+            case log_severity::warn: return fmtutil::to_view("WARN");
+            case log_severity::error: return fmtutil::to_view("ERROR");
+            case log_severity::fatal: return fmtutil::to_view("FATAL");
+        }
+        return fmtutil::to_view("<unknown>");
     }
 
     template <int N>
@@ -243,6 +301,11 @@ struct fmtutil {
     static constexpr fmt::string_view to_view(const buffer_t<SIZE>& buff)
     {
         return fmt::string_view{buff.data(), buff.size()};
+    }
+
+    static fmt::string_view to_view(const std::string& str)
+    {
+        return fmt::string_view{str.c_str(), str.size()};
     }
 
     template <std::size_t SIZE>

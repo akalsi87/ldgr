@@ -102,25 +102,26 @@ TEST_CASE("logentry: basic")
         data = log_entry_util::copy_log_entry(entry, false, factory);
         REQUIRE(data.buffer.get() == buff);
     }
-    SECTION("benchmarks")
-    {
-        auto pooled_fact = pooled_log_buffer_factory::create();
-        auto& factory = *pooled_fact;
-        BENCHMARK("copying entries default")
-        {
-            auto out = log_entry_util::copy_log_entry(entry, false);
-        };
-        BENCHMARK("copying entries pooled")
-        {
-            auto out = log_entry_util::copy_log_entry(entry, false, factory);
-        };
-        BENCHMARK("default factory")
-        {
-            default_log_buffer_factory()();
-        };
-        BENCHMARK("pooled factory")
-        {
-            factory();
-        };
-    }
+    // SECTION("benchmarks")
+    // {
+    //     auto pooled_fact = pooled_log_buffer_factory::create();
+    //     auto& factory = *pooled_fact;
+    //     BENCHMARK("copying entries default")
+    //     {
+    //         auto out = log_entry_util::copy_log_entry(entry, false);
+    //     };
+    //     BENCHMARK("copying entries pooled")
+    //     {
+    //         auto out = log_entry_util::copy_log_entry(entry, false,
+    //         factory);
+    //     };
+    //     BENCHMARK("default factory")
+    //     {
+    //         default_log_buffer_factory()();
+    //     };
+    //     BENCHMARK("pooled factory")
+    //     {
+    //         factory();
+    //     };
+    // }
 }

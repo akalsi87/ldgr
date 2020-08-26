@@ -265,6 +265,7 @@ struct log_entry_util {
         out.entry.name = append_str(entry_fmt.name);
         out.entry.file = append_str(entry_fmt.file);
         out.entry.line = append_str(entry_fmt.line);
+        out.entry.time = entry_fmt.time;
         out.entry.time_struct = entry_fmt.time_struct;
         out.entry.microseconds = entry_fmt.microseconds;
         out.entry.is_local = entry_fmt.is_local;

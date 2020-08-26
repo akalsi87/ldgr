@@ -41,10 +41,10 @@
 
 namespace ldgr {
 
-inline void default_formatter(log_buffer_t& buff,
-                              const log_entry_fmt_cp& ent,
-                              std::time_t& cached_time,
-                              std::string& cached_str);
+LDGR_API void default_formatter(log_buffer_t& buff,
+                                const log_entry_fmt_cp& ent,
+                                std::time_t& cached_time,
+                                std::string& cached_str);
 
 struct log_formatter {
     using format_fn = void (*)(log_buffer_t&,
@@ -61,14 +61,14 @@ struct log_formatter {
 
     log_formatter(const as_vec&): d_is_vec_{true}
     {
-        ::new (&d_vec_) std::vector<format_fn>{};
+        ::new ((void*)&d_vec_) std::vector<format_fn>{};
     }
 
     log_formatter(const log_formatter& fmt)
     {
         d_is_vec_ = fmt.d_is_vec_;
         if (d_is_vec_) {
-            ::new (&d_vec_) std::vector<format_fn>(fmt.vec());
+            ::new ((void*)&d_vec_) std::vector<format_fn>(fmt.vec());
         }
         else {
             d_fmt_fn_ = fmt.d_fmt_fn_;
@@ -124,39 +124,6 @@ struct log_formatter {
     mutable std::time_t d_cached_time_{};
     mutable std::string d_cached_str_{};
 };
-
-inline void default_formatter(log_buffer_t& buff,
-                              const log_entry_fmt_cp& ent,
-                              std::time_t& cached_time,
-                              std::string& cached_str)
-{
-    const auto& e = ent.entry;
-
-    if (e.time != cached_time) {
-        fmtutil::append(buff, e.time_struct);
-        cached_time = e.time;
-        cached_str.assign(buff.begin(), buff.end());
-    }
-    else {
-        fmtutil::append(buff, cached_str);
-    }
-    fmtutil::append(buff, '.');
-    fmtutil::append_pad_int<6>(buff, e.microseconds);
-    if (!e.is_local) {
-        fmtutil::append(buff, 'Z');
-    }
-    fmtutil::append(buff, " [");
-    fmtutil::append(buff, e.severity);
-    fmtutil::append(buff, "] ");
-    fmtutil::append(buff, e.name);
-    fmtutil::append(buff, ' ');
-    fmtutil::append(buff, fmtutil::trunc_file(e.file));
-    fmtutil::append(buff, ':');
-    fmtutil::append(buff, e.line);
-    fmtutil::append(buff, ' ');
-    fmtutil::append(buff, e.message);
-    fmtutil::append_eol(buff);
-}
 
 class LDGR_API log_sink {
   public:

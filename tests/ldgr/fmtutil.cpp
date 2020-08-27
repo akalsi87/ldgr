@@ -72,9 +72,9 @@ TEST_CASE("fmtutil: basic")
     }
     SECTION("truncate file name - case 1")
     {
-        constexpr auto v = fmtutil::to_view("x/y/z");
+        constexpr auto v = fmtutil::to_view("w/x/y/z");
         constexpr auto trunc = fmtutil::trunc_file(v);
-        REQUIRE(trunc == fmtutil::to_view("y/z"));
+        REQUIRE(trunc == fmtutil::to_view("x/y/z"));
     }
     SECTION("truncate file name - case 2")
     {

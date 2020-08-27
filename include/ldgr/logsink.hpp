@@ -180,12 +180,7 @@ class LDGR_API log_sink {
     virtual void do_log(const log_buffer_t& buff) = 0;
     virtual void do_flush() = 0;
 
-    static std::shared_ptr<const log_formatter> default_fmt()
-    {
-        static const std::shared_ptr<const log_formatter> s_fmt{
-            std::make_shared<log_formatter>(&default_formatter)};
-        return s_fmt;
-    }
+    static std::shared_ptr<const log_formatter> default_fmt();
 };
 
 struct LDGR_API log_sink_factory {

@@ -171,7 +171,7 @@ struct fmtutil {
     static constexpr buffer_t<SIZE>& append(buffer_t<SIZE>& dest,
                                             const char (&str)[STR_SIZE])
     {
-        dest.append(std::begin(str), std::end(str) - 1);
+        dest.append(&str[0], &str[STR_SIZE - 1]);
         return dest;
     }
 
@@ -257,10 +257,9 @@ struct fmtutil {
 
     static constexpr fmt::string_view trunc_file(const fmt::string_view& v)
     {
-        fmt::string_view x{v};
         int count = 0;
-        auto sz = x.size();
-        auto beg = x.data();
+        auto sz = v.size();
+        auto beg = v.data();
         auto ridx = sz - 1;
         for (std::size_t i = 0; i < sz; ++i, --ridx) {
             if (beg[ridx] == '/'
@@ -268,13 +267,12 @@ struct fmtutil {
                 || beg[ridx] == '\\'
 #endif
             ) {
-                if (++count == 2) {
-                    fmt::string_view ret{beg + sz - i, i};
-                    return ret;
+                if (++count == 3) {
+                    return fmt::string_view{beg + sz - i, i};
                 }
             }
         }
-        return x;
+        return v;
     }
 
     static constexpr fmt::string_view to_view(log_severity sev)

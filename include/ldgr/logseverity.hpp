@@ -29,13 +29,13 @@
 namespace ldgr {
 
 enum class log_severity {
-    off = 0,
     trace = 4,
     debug = 8,
     info = 12,
     warn = 16,
     error = 20,
-    fatal = 24
+    fatal = 24,
+    off = 100,
 };
 
 } // namespace ldgr

@@ -70,6 +70,13 @@ struct file_sink final : public log_sink {
     }
 };
 
+std::shared_ptr<const log_formatter> log_sink::default_fmt()
+{
+    static const std::shared_ptr<const log_formatter> s_fmt{
+        std::make_shared<log_formatter>(&default_formatter)};
+    return s_fmt;
+}
+
 std::shared_ptr<log_sink> log_sink_factory::stdout_sink()
 {
     static std::shared_ptr<log_sink> s_err{

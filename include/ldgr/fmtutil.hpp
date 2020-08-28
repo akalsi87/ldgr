@@ -36,11 +36,14 @@
 #include <ctime>
 #include <memory>
 #include <string>
+#include <type_traits>
 
 namespace ldgr {
 
 template <std::size_t SIZE>
 using buffer_t = fmt::basic_memory_buffer<char, SIZE>;
+
+using log_buffer_t = buffer_t<1024>;
 
 template <class INT, int POW>
 constexpr INT pow10()
@@ -289,14 +292,13 @@ struct fmtutil {
         return fmtutil::to_view("<unknown>");
     }
 
-    template <int N>
-    static constexpr fmt::string_view to_view(const char (&str)[N])
+    static constexpr fmt::string_view to_view(const char* str)
     {
-        return fmt::string_view{str, N - 1};
+        return fmt::string_view{str};
     }
 
     template <std::size_t SIZE>
-    static constexpr fmt::string_view to_view(const buffer_t<SIZE>& buff)
+    static fmt::string_view to_view(const buffer_t<SIZE>& buff)
     {
         return fmt::string_view{buff.data(), buff.size()};
     }
@@ -312,8 +314,6 @@ struct fmtutil {
         return fmt::to_string(dest);
     }
 };
-
-using log_buffer_t = buffer_t<1024>;
 
 } // namespace ldgr
 

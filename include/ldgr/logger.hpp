@@ -151,6 +151,39 @@ class log_registry {
     }
 };
 
+namespace dtl {
+
+template <class T>
+struct format_checker {
+    enum { value = false };
+};
+
+template <class... ARGS>
+constexpr bool check_formatters()
+{
+    constexpr bool values[] = {
+        fmt::has_formatter<ARGS, fmt::format_context>::value...};
+    for (auto x : values) {
+        if (!x) {
+            return false;
+        }
+    }
+    return true;
+}
+
+template <class... ARGS>
+struct format_checker<std::tuple<ARGS...>> {
+    enum { value = check_formatters<ARGS...>() };
+};
+
+template <class... ARGS>
+auto derive_types(ARGS&&...) -> format_checker<std::tuple<ARGS...>>
+{
+    return {};
+};
+
+} // namespace dtl
+
 } // namespace ldgr
 
 #define LDGR__STR2(x) #x
@@ -163,7 +196,17 @@ class log_registry {
             break;                                                            \
         }                                                                     \
         ::ldgr::log_buffer_t buff;                                            \
-        ::fmt::format_to(::std::back_inserter(buff), fmtstr, ##__VA_ARGS__);  \
+        using compile_time_format =                                           \
+            decltype(::ldgr::dtl::derive_types(__VA_ARGS__));                 \
+        if constexpr (compile_time_format::value) {                           \
+            ::fmt::format_to(::std::back_inserter(buff),                      \
+                             FMT_COMPILE(fmtstr),                             \
+                             ##__VA_ARGS__);                                  \
+        }                                                                     \
+        else {                                                                \
+            ::fmt::format_to(                                                 \
+                ::std::back_inserter(buff), fmtstr, ##__VA_ARGS__);           \
+        }                                                                     \
         ::ldgr::log_entry entry{                                              \
             ::ldgr::log_severity::lvl,                                        \
             ::ldgr::fmtutil::to_view(cat),                                    \
